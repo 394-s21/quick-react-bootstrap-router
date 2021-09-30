@@ -17,10 +17,10 @@ const firebase = getApps().length === 0
 ? initializeApp(firebaseConfig)
 : getApp();
 
-const auth = getAuth();
-const database = getDatabase();
+const auth = getAuth(firebase);
+const database = getDatabase(firebase);
 
-export const useData = (path, options) => {
+export const useData = (path, transform) => {
   const [data, setData] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
@@ -29,7 +29,8 @@ export const useData = (path, options) => {
     const dbRef = ref(database, path);
     return onValue(dbRef, (snapshot) => {
       const val = snapshot.val();
-      setData(options && options.transform ? options.transform(val) : val);
+      setData(transform ? transform(val) : val);
+      console.log('loaded data')
       setLoading(false);
       setError(null);
     }, (error) => {
@@ -37,7 +38,7 @@ export const useData = (path, options) => {
       setLoading(false);
       setError(error);
     });
-  }, [path, options]);
+  }, [path, transform]);
 
   return [data, loading, error];
 };

@@ -173,7 +173,7 @@ const CourseList = ({ courses }) => {
 
 const App = () => {
   
-  const [schedule, loading, error] = useData('/schedule', { transform: addScheduleTimes }); 
+  const [schedule, loading, error] = useData('/schedule', addScheduleTimes); 
   
  /*  
   const [schedule, setSchedule] = useState();
