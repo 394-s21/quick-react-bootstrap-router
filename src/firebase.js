@@ -20,6 +20,7 @@ const firebase = getApps().length === 0
 const auth = getAuth(firebase);
 const database = getDatabase(firebase);
 
+
 export const useData = (path, transform) => {
   const [data, setData] = useState();
   const [loading, setLoading] = useState(true);
@@ -27,10 +28,12 @@ export const useData = (path, transform) => {
 
   useEffect(() => {
     const dbRef = ref(database, path);
+    const devMode = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+    if (devMode) { console.log(`loading ${path}`); }
     return onValue(dbRef, (snapshot) => {
       const val = snapshot.val();
+      if (devMode) { console.log(val); }
       setData(transform ? transform(val) : val);
-      console.log('loaded data')
       setLoading(false);
       setError(null);
     }, (error) => {
