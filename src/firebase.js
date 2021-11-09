@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getDatabase, onValue, ref, set } from 'firebase/database';
-import { getAuth, GoogleAuthProvider, onIdTokenChanged, signInWithPopup, signOut } from 'firebase/auth';
+import { getAuth, getRedirectResult, GoogleAuthProvider, onIdTokenChanged, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDp9QVoEc3rX33r9VQf4i6ph3mfKygIkto",
@@ -52,6 +52,16 @@ export const setData = (path, value) => {
 
 export const signInWithGoogle = () => {
   signInWithPopup(auth, new GoogleAuthProvider());
+};
+
+export const signInWithGoogleRedirect = async () => {
+  signInWithRedirect(auth, new GoogleAuthProvider());
+  try {
+    const result = await getRedirectResult(auth);
+    console.log(result.user);
+  } catch (error) {
+    console.log(error.code);
+  }
 };
 
 const firebaseSignOut = () => signOut(auth);

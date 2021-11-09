@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { setData, signInWithGoogle, signOut, useData, useUserState } from './firebase.js';
+import { setData, signInWithGoogle, signInWithGoogleRedirect, signOut, useData, useUserState } from './firebase.js';
 import './App.css';
 
 const Banner = ({ title }) => (
@@ -100,7 +100,8 @@ const Course = ({ course, selected, setSelected }) => {
   };
 
   return (
-    <div className="card m-1 p-2" 
+    <div className="card m-1 p-2"
+        data-cy="course"
         style={style}
         onClick={(isDisabled) ? null : () => setSelected(toggle(course, selected))}
         onDoubleClick={!user ? null : () => reschedule(course, getMeetingData(course))}>
@@ -114,7 +115,7 @@ const Course = ({ course, selected, setSelected }) => {
 };
 
 const SignInButton = () => (
-  <button className="btn btn-secondary btn-sm" onClick={() => signInWithGoogle()}>
+  <button className="btn btn-secondary btn-sm" onClick={() => signInWithGoogleRedirect()}>
     Sign In
   </button>
 );
@@ -129,7 +130,7 @@ const TermButton = ({term, setTerm, checked}) => (
   <>
     <input type="radio" id={term} className="btn-check" checked={checked} autoComplete="off"
       onChange={() => setTerm(term)} />
-    <label className="btn btn-success m-1 p-2" htmlFor={term}>
+    <label className="btn btn-success m-1 p-2" htmlFor={term} data-cy={term} >
     { term }
     </label>
   </>
