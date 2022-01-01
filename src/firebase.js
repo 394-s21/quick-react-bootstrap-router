@@ -20,7 +20,6 @@ const firebase = getApps().length === 0
 const auth = getAuth(firebase);
 const database = getDatabase(firebase);
 
-
 export const useData = (path, transform) => {
   const [data, setData] = useState();
   const [loading, setLoading] = useState(true);

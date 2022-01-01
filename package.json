@@ -28,6 +28,9 @@
       "react-app/jest"
     ]
   },
+  "jest": {
+    "resetMocks": true
+  },
   "browserslist": {
     "production": [
       ">0.2%",

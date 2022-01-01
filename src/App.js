@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { setData, signInWithGoogle, signInWithGoogleRedirect, signOut, useData, useUserState } from './firebase.js';
+import { setData, signInWithGoogleRedirect, signOut, useData, useUserState } from './firebase';
 import './App.css';
 
 const Banner = ({ title }) => (
@@ -120,7 +120,7 @@ const SignInButton = () => (
   </button>
 );
 
-const SignOuButton = () => (
+const SignOutButton = () => (
   <button className="btn btn-secondary btn-sm" onClick={() => signOut()}>
     Sign Out
   </button>
@@ -147,7 +147,7 @@ const TermSelector = ({term, setTerm}) => {
         )
       }
       </div>
-      { user ? <SignOuButton /> : <SignInButton /> }
+      { user ? <SignOutButton /> : <SignInButton /> }
     </div>
   );
 };
@@ -173,28 +173,8 @@ const CourseList = ({ courses }) => {
 };
 
 const App = () => {
-  
   const [schedule, loading, error] = useData('/schedule', addScheduleTimes); 
   
- /*  
-  const [schedule, setSchedule] = useState();
-  const url = 'https://courses.cs.northwestern.edu/394/data/cs-courses.php';
-
- 
-  const loading = !schedule;
-  const error = undefined;
-
-  useEffect(() => {
-    const fetchSchedule = async () => {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(response.statusText);
-      const json = await response.json();
-      setSchedule(addScheduleTimes(json));
-    };
-
-    fetchSchedule();
-  }, []);
-*/
   if (error) return <h1>{error}</h1>;
   if (loading) return <h1>Loading the schedule...</h1>
 
