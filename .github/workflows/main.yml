@@ -31,5 +31,5 @@ jobs:
       - uses: cypress-io/github-action@v2
         with:
           build: npm run build
-          start: npm em:run
+          start: npm run em:run
           wait-on: http://localhost:3000
