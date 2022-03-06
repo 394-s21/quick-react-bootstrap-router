@@ -4,7 +4,9 @@ import { setData, signInWithGoogleRedirect, signOut, useData, useUserState } fro
 import './App.css';
 
 const Banner = ({ title }) => (
-  <h1>{ title }</h1>
+  <h1>
+    { title }
+  </h1>
 );
 
 const terms = { F: 'Fall', W: 'Winter', S: 'Spring'};
@@ -152,9 +154,17 @@ const TermSelector = ({term, setTerm}) => {
   );
 };
 
+const scheduleChanged = (selected, courses) => (
+  selected.some(course => course !== courses[course.id])
+);
+
 const CourseList = ({ courses }) => {
   const [term, setTerm] = useState('Fall');
   const [selected, setSelected] = useState([]);
+  if (scheduleChanged(selected, courses)) {
+    console.log('schedule changed');
+    setSelected([])
+  };
   const termCourses = Object.values(courses).filter(course => term === getCourseTerm(course));
   
   return (

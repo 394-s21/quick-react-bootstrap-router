@@ -1,4 +1,4 @@
-// App.spec.js created with Cypress
+/* globals cy */
 
 describe ('Test App', () => {
 
@@ -16,4 +16,9 @@ describe ('Test App', () => {
     cy.get('[data-cy=Winter]').click();
     cy.get('[data-cy=course]').should('contain' ,'Winter');
   });
+
+  it('shows Sign Out for logged in user', () => {
+    cy.visit('/');
+    cy.contains('Sign Out');
+  })
 });

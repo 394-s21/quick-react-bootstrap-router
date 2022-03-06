@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getApp, getApps, initializeApp } from 'firebase/app';
-import { getDatabase, onValue, ref, set } from 'firebase/database';
-import { getAuth, getRedirectResult, GoogleAuthProvider, onIdTokenChanged, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
+import { connectDatabaseEmulator, getDatabase, onValue, ref, set } from 'firebase/database';
+import { connectAuthEmulator, getAuth, getRedirectResult, GoogleAuthProvider, onIdTokenChanged, signInWithCredential, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDp9QVoEc3rX33r9VQf4i6ph3mfKygIkto",
@@ -20,18 +20,25 @@ const firebase = getApps().length === 0
 const auth = getAuth(firebase);
 const database = getDatabase(firebase);
 
-export const useData = (path, transform) => {
+if (window.Cypress) {
+  console.log('cypress with emulators')
+  connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+  connectDatabaseEmulator(database, '127.0.0.1', 9000);
+
+  signInWithCredential(auth, GoogleAuthProvider.credential(
+    '{"sub": "qEvli4msW0eDz5mSVO6j3W7i8w1k", "email": "tester@gmail.com", "displayName":"Test User", "email_verified": true}'
+  ));
+}
+
+export const useData = (path, transform) => { 
   const [data, setData] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
 
   useEffect(() => {
     const dbRef = ref(database, path);
-    const devMode = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
-    if (devMode) { console.log(`loading ${path}`); }
     return onValue(dbRef, (snapshot) => {
       const val = snapshot.val();
-      if (devMode) { console.log(val); }
       setData(transform ? transform(val) : val);
       setLoading(false);
       setError(null);
