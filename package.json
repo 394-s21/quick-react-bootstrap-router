@@ -1,5 +1,5 @@
 {
-  "name": "quick-react-bootstrap",
+  "name": "quick-react-bootstrap-router",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -7,12 +7,14 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "bootstrap": "^5.0.2",
-    "firebase": "^9.0.2",
+    "firebase": "^9.7.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-firebase-hooks": "^3.0.4",
-    "react-scripts": "^5.0.0",
+    "react-router-dom": "^6.3.0",
+    "react-scripts": "^5.0.1",
     "use-double-click": "^1.0.5",
+    "wait-on": "^6.0.1",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
@@ -21,9 +23,10 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "cy:open": "cypress open",
-    "cy:run": "cypress run",
+    "cy:run": "cypress run --video=false",
     "em:start": "firebase emulators:start --import=./saved-data --export-on-exit",
-    "em:run": "firebase emulators:exec --ui --import=./saved-data 'npm start'"
+    "em:exec": "REACT_APP_EMULATE=true firebase emulators:exec --ui --import=./saved-data 'npm start'",
+    "em:cy:open": "start-server-and-test em:exec http://127.0.0.1:3000 cy:open"
   },
   "eslintConfig": {
     "extends": [
@@ -47,6 +50,7 @@
     ]
   },
   "devDependencies": {
-    "cypress": "^9.5.0"
+    "cypress": "^9.7.0",
+    "start-server-and-test": "^1.14.0"
   }
 }

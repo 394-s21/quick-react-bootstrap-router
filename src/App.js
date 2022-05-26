@@ -1,7 +1,10 @@
 
 import React, { useState } from 'react';
-import { setData, signInWithGoogleRedirect, signOut, useData, useUserState } from './firebase';
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { signInWithGoogleRedirect, signOut, useData, useUserState } from './firebase';
+import EditForm from './EditForm';
 import './App.css';
+import { timeParts } from './times';
 
 const Banner = ({ title }) => (
   <h1>
@@ -20,19 +23,6 @@ const getCourseNumber = course => (
 );
 
 const days = ['M', 'Tu', 'W', 'Th', 'F'];
-
-const meetsPat = /^ *((?:M|Tu|W|Th|F)+) +(\d\d?):(\d\d) *[ -] *(\d\d?):(\d\d) *$/;
-
-const timeParts = meets => {
-  const [match, days, hh1, mm1, hh2, mm2] = meetsPat.exec(meets) || [];
-  return !match ? {} : {
-    days,
-    hours: {
-      start: hh1 * 60 + mm1 * 1,
-      end: hh2 * 60 + mm2 * 1
-    }
-  };
-};
 
 const daysOverlap = (days1, days2) => ( 
   days.some(day => days1.includes(day) && days2.includes(day))
@@ -75,38 +65,21 @@ const toggle = (x, lst) => (
   lst.includes(x) ? lst.filter(y => y !== x) : [x, ...lst]
 );
 
-const getMeetingData = course => {
-  const meets = prompt('Enter meeting data: MTuWThF hh:mm-hh:mm', course.meets);
-  const valid = !meets || timeParts(meets).days;
-  if (valid) return meets;
-  alert('Invalid meeting data');
-  return null;
-};
-
-const reschedule = async (course, meets) => {
-  if (meets && window.confirm(`Change ${course.id} to ${meets}?`)) {
-    try {
-      await setData(`schedule/courses/${course.id}/meets`, meets);
-    } catch (error) {
-      alert(error);
-    }
-  }
-};
-
 const Course = ({ course, selected, setSelected }) => {
+  const navigate = useNavigate();
   const isSelected = selected.includes(course);
   const isDisabled = hasConflict(course, selected);
   const [user] = useUserState();
   const style = {
     backgroundColor: isDisabled? 'lightgrey' : isSelected ? 'lightgreen' : 'white'
   };
-
+  
   return (
     <div className="card m-1 p-2"
         data-cy="course"
         style={style}
         onClick={(isDisabled) ? null : () => setSelected(toggle(course, selected))}
-        onDoubleClick={!user ? null : () => reschedule(course, getMeetingData(course))}>
+        onDoubleClick={!user ? null : () => navigate('/edit', { state: course })}>
       <div className="card-body">
         <div className="card-title">{ getCourseTerm(course) } CS { getCourseNumber(course) }</div>
         <div className="card-text">{ course.title }</div>
@@ -140,6 +113,8 @@ const TermButton = ({term, setTerm, checked}) => (
 
 const TermSelector = ({term, setTerm}) => {
   const [user] = useUserState();
+  console.log(`user ${user}`);
+  
   return (
     <div className="btn-toolbar justify-content-between">
       <div className="btn-group">
@@ -191,7 +166,12 @@ const App = () => {
   return (
     <div className="container">
       <Banner title={ schedule.title } />
-      <CourseList courses={ schedule.courses } />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<CourseList courses={ schedule.courses } />} />
+          <Route path="/edit" element={ <EditForm courses={ schedule.courses } /> } />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 };

@@ -20,14 +20,20 @@ const firebase = getApps().length === 0
 const auth = getAuth(firebase);
 const database = getDatabase(firebase);
 
-if (window.Cypress) {
-  console.log('cypress with emulators')
-  connectAuthEmulator(auth, 'http://127.0.0.1:9099');
-  connectDatabaseEmulator(database, '127.0.0.1', 9000);
 
-  signInWithCredential(auth, GoogleAuthProvider.credential(
-    '{"sub": "qEvli4msW0eDz5mSVO6j3W7i8w1k", "email": "tester@gmail.com", "displayName":"Test User", "email_verified": true}'
-  ));
+if (process.env.REACT_APP_EMULATE) {
+  console.log('running with emulators')
+  try { 
+    connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+    connectDatabaseEmulator(database, '127.0.0.1', 9000);
+
+    signInWithCredential(auth, GoogleAuthProvider.credential(
+      '{"sub": "qEvli4msW0eDz5mSVO6j3W7i8w1k", "email": "tester@gmail.com", "displayName":"Test User", "email_verified": true}'
+    ));
+  }
+  catch (e) {
+    console.log(e)
+  }
 }
 
 export const useData = (path, transform) => { 
@@ -52,9 +58,9 @@ export const useData = (path, transform) => {
   return [data, loading, error];
 };
 
-export const setData = (path, value) => {
-  set(ref(database, path), value);
-};
+export const setData = async (path, value) => (
+  set(ref(database, path), value)
+);
 
 export const signInWithGoogle = () => {
   signInWithPopup(auth, new GoogleAuthProvider());

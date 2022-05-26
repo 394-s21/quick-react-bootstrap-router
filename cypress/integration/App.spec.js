@@ -21,4 +21,11 @@ describe ('Test App', () => {
     cy.visit('/');
     cy.contains('Sign Out');
   })
+
+  it('shows Sign In after signing out', () => {
+    cy.visit('/');
+    cy.contains('Sign Out').click();
+    cy.contains('Sign In');
+    cy.contains('Sign Out').should('not.exist');
+  })
 });
