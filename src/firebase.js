@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
 import { getApp, getApps, initializeApp } from 'firebase/app';
-import { connectDatabaseEmulator, getDatabase, onValue, ref, set } from 'firebase/database';
-import { connectAuthEmulator, getAuth, getRedirectResult, GoogleAuthProvider, onIdTokenChanged, signInWithCredential, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
+import { connectDatabaseEmulator, getDatabase, ref } from 'firebase/database';
+import { useDatabaseValue, useDatabaseSetMutation } from "@react-query-firebase/database";
+import { connectAuthEmulator, getAuth, getRedirectResult, GoogleAuthProvider, signInWithCredential, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDp9QVoEc3rX33r9VQf4i6ph3mfKygIkto",
@@ -36,31 +37,17 @@ if (process.env.REACT_APP_EMULATE) {
   }
 }
 
-export const useData = (path, transform) => { 
-  const [data, setData] = useState();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState();
+export const useData = (path, transform) => {
+  const { data, isLoading, error } = useDatabaseValue(path, ref(database, path), { subscribe: true });
+  const value = (!isLoading && !error && transform) ? transform(data) : data;
 
-  useEffect(() => {
-    const dbRef = ref(database, path);
-    return onValue(dbRef, (snapshot) => {
-      const val = snapshot.val();
-      setData(transform ? transform(val) : val);
-      setLoading(false);
-      setError(null);
-    }, (error) => {
-      setData(null);
-      setLoading(false);
-      setError(error);
-    });
-  }, [path, transform]);
-
-  return [data, loading, error];
+  return [ value, isLoading, error ];
 };
 
-export const setData = async (path, value) => (
-  set(ref(database, path), value)
-);
+export const useSetData = (path) => {
+  const mutation = useDatabaseSetMutation(ref(database, path));
+  return [ mutation.mutate, mutation.isLoading, mutation.error ];
+};
 
 export const signInWithGoogle = () => {
   signInWithPopup(auth, new GoogleAuthProvider());
@@ -80,12 +67,4 @@ const firebaseSignOut = () => signOut(auth);
 
 export { firebaseSignOut as signOut };
 
-export const useUserState = () => {
-  const [user, setUser] = useState();
-
-  useEffect(() => {
-    onIdTokenChanged(auth, setUser);
-  }, []);
-
-  return [user];
-};
+export const useUserState = () => useAuthState(firebase.auth());

@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 import { signInWithGoogleRedirect, signOut, useData, useUserState } from './firebase';
 import EditForm from './EditForm';
 import './App.css';
@@ -157,7 +159,9 @@ const CourseList = ({ courses }) => {
   );
 };
 
-const App = () => {
+const Main = () => {
+  // const url = 'https://courses.cs.northwestern.edu/394/data/cs-courses.php';
+  // const [schedule, loading, error] = useFileData(url, addScheduleTimes);
   const [schedule, loading, error] = useData('/schedule', addScheduleTimes); 
   
   if (error) return <h1>{error}</h1>;
@@ -175,5 +179,14 @@ const App = () => {
     </div>
   );
 };
+
+const queryClient = new QueryClient();
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+      <Main />
+      <ReactQueryDevtools initialIsOpen />
+    </QueryClientProvider>
+);
 
 export default App;

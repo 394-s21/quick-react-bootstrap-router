@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { setData } from './firebase';
+import { useSetData } from './firebase';
 import { useForm } from './useForm';
 import { timeParts } from "./times";
 
@@ -16,7 +16,7 @@ const validateCourseData = (key, val) => {
   }
 };
 
-const submit = async (values) => {
+const submit = async (setData, values) => {
   if (window.confirm(`Change ${values.id} to ${values.title}: ${values.meets}`)) {
     try {
       await setData(`schedule/courses/${values.id}/`, values);
@@ -28,9 +28,10 @@ const submit = async (values) => {
 
 const EditForm = () => {
   const { state: course } = useLocation();
-  const [ errors, handleSubmit ] = useForm(validateCourseData, submit);
+  const [ setData, loading, error ] = useSetData(`schedule/courses/${course.id}/`);
+  const [ errors, handleSubmit ] = useForm(validateCourseData, (data) => submit(setData, data));
   return (
-    <form onSubmit={handleSubmit} noValidate className={errors ? 'was-validated' : null}>
+    <form onSubmit={!loading && !error ? handleSubmit : null} noValidate className={errors ? 'was-validated' : null}>
       <input type="hidden" name="id" value={course.id} />
       <div className="mb-3">
         <label htmlFor="title" className="form-label">Course title</label>
